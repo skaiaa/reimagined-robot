@@ -10,8 +10,8 @@ class LocationHandler:
             # {//nie wylosuje miejsca gdzie stoje, kiedy rozmnazam
             if bool(random.getrandbits(1)):
                 result.change_to(
-                    (random.randint(step) + 1) * (1 if bool(random.getrandbits(1)) else -1), 0)
+                    (random.randint(step-1) + 1) * (1 if bool(random.getrandbits(1)) else -1), 0)
             else:
-                result.change_to(0, (random.randint(step) + 1) * (
+                result.change_to(0, (random.randint(step-1) + 1) * (
                     1 if bool(random.getrandbits(1)) else -1))
         return result

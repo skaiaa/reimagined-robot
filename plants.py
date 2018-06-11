@@ -36,7 +36,7 @@ class Dandelion(Plant):
 
     def action(self, organisms):
         spreading_locations = []
-        chance_of_spreading = randint(0, 100)
+        chance_of_spreading = randint(0, 99)
         if self._spreading_probability >= chance_of_spreading:
             for _ in range(0, 2):
                 spreading_locations.append(self.choose_new_location(self.get_location()))
@@ -106,7 +106,7 @@ class SosnowskysBorscht(Plant):
                     and o.get_location() == self.get_location().return_increased(Location(0, 1)):
                 to_kill.append(o)
                 someone_killed = True
-        if self._spreading_probability >= randint(0, 100):
+        if self._spreading_probability >= randint(0, 99):
             spreading_locations.append(self.choose_new_location(self.get_location()))
             return Spreading(spreading_locations, to_kill)
         if someone_killed:

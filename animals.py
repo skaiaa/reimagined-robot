@@ -28,7 +28,7 @@ class Antelope(Animal):
         self.set_step(2)
 
     def is_running_away(self):
-        return randint(0, 100) < 50
+        return randint(0, 99) < 50
 
     def get_name(self):
         return "Antelope"
@@ -87,7 +87,7 @@ class Turtle(Animal):
 
     def action(self, organisms):
         new_location = self.choose_new_location(self.get_location())
-        if randint(0, 100) < self._probability_to_move:
+        if randint(0, 99) < self._probability_to_move:
             return Moving(new_location, [])
         else:
             return DoNothing()

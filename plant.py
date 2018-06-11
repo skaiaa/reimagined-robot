@@ -5,6 +5,7 @@ from virtual_world.actions import *
 
 class Plant(Organism):
     def __init__(self, prob):
+        super(Plant, self).__init__()
         self._spreading_probability = prob
 
     def get_initiative(self):
@@ -34,12 +35,12 @@ class Plant(Organism):
         change_in_location = Location(0, 0)
         while (change_in_location.x == 0 and change_in_location.y == 0
                and self.get_location() == from_where.return_increased(change_in_location)):
-            change_in_location.change_to(randint(0, 3) - 1, randint(0, 3) - 1)
+            change_in_location.change_to(randint(0, 2) - 1, randint(0, 2) - 1)
         return from_where.return_increased(change_in_location)
 
     def action(self, organisms):
         spreading_locations = []
-        chance_of_spreading = randint(0, 100)
+        chance_of_spreading = randint(0, 99)
         spreading_locations.append(self.choose_new_location(self.get_location()))
         if self._spreading_probability >= chance_of_spreading:
             return Spreading(spreading_locations, [])

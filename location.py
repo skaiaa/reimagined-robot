@@ -8,7 +8,7 @@ class Location:
 
     @classmethod
     def get_random_location(cls, width, height):
-        return cls(randint(0, width), randint(0, height))
+        return cls(randint(0, width-1), randint(0, height-1))
 
     def return_increased(self, other):
         return Location(other.x + self.x, other.y + self.y)

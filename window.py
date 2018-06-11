@@ -1,6 +1,7 @@
 import tkinter as tk
 from virtual_world.gui import Dialog
 from tkinter import scrolledtext
+from virtual_world.world import World
 
 
 class WorldSizeDialog(Dialog):
@@ -41,6 +42,7 @@ class Application(tk.Frame):
         self.new_game_btn = None
         self.next_turn_btn = None
         self.logging_stext = None
+        self.world = World(dimentions[0], dimentions[1])
         self.create_widgets(master)
         self.create_board(master, dimentions)
         master.bind("<Escape>", lambda _: root.destroy())
@@ -72,8 +74,7 @@ class Application(tk.Frame):
 
         def create_square(i, j):
             f = tk.Frame(game_frame, height=30, width=30)
-            s = tk.Button(f, borderwidth=1, state="normal",
-                          disabledforeground="#000000")
+            s = tk.Button(f, borderwidth=1, state="normal", foreground="#000000")
             s.pack(fill=tk.BOTH, expand=True)
 
             # buttons bindings
@@ -95,6 +96,8 @@ class Application(tk.Frame):
 
         BOARD = [[create_square(i, j) for j in range(dimentions[0])]
                  for i in range(dimentions[1])]
+        for o in self.world.organisms:
+            BOARD[o.get_location().y][o.get_location().x]["text"] = o.get_symbol()
         game_frame.pack(padx=10, pady=10, side="right")
         return BOARD
 
@@ -102,8 +105,9 @@ class Application(tk.Frame):
         print("hi there, everyone!")
 
 
-root = tk.Tk()
-dialog = WorldSizeDialog(root, "Enter world size")
-app = Application(root, dialog.result)
+if __name__ == "__main__":
 
-app.mainloop()
+    root = tk.Tk()
+    dialog = WorldSizeDialog(root, "Enter world size")
+    app = Application(root, dialog.result)
+    app.mainloop()
