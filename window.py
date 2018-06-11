@@ -32,7 +32,7 @@ class WorldSizeDialog(Dialog):
 
 
 class Application(tk.Frame):
-    def __init__(self, master,dimentions):
+    def __init__(self, master, dimentions):
         super().__init__(master)
         self.pack()
         self.quit_btn = None
@@ -43,6 +43,7 @@ class Application(tk.Frame):
         self.logging_stext = None
         self.create_widgets(master)
         self.create_board(master, dimentions)
+        master.bind("<Escape>", lambda _: root.destroy())
 
     def create_widgets(self, window):
         widget_frame = tk.Frame(window)
