@@ -19,7 +19,7 @@ class OrganismGenerator:
 
     @staticmethod
     def get_initial_organisms(width, height):
-        all_symbols = "WAFSSSSSSSSSSSSSSSSudssssssssssssssss"
+        all_symbols = "WAFSSSSSSSSSCCCCCCCSSCCCSudssssssssssssssss"
         initial_organisms = []
         for l in all_symbols:
             # tutaj robie po jednym kazdego rodzaju

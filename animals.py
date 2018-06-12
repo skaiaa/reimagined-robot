@@ -129,6 +129,12 @@ class CyberSheep(Sheep):
     def get_color(self):
         return "metallic"
 
+    def is_immune_to_killing_by(self, killer):
+        if isinstance(killer, SosnowskysBorscht):
+            return True
+        else:
+            return False
+
     def action(self, organisms):
         def distance(location):
             return abs(self.get_location().x - location.x) + abs(self.get_location().y - location.y)

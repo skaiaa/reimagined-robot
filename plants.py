@@ -3,7 +3,6 @@ from random import randint
 from virtual_world.actions import *
 from virtual_world.animal import Animal
 
-
 class Belladonna(Plant):
     def __init__(self):
         super(Belladonna, self).__init__(20)
@@ -99,11 +98,11 @@ class SosnowskysBorscht(Plant):
         to_kill = []
         someone_killed = False
         for o in organisms:
-            if isinstance(o, Animal) \
-                    and o.get_location() == self.get_location().return_increased(Location(-1, 0)) \
-                    and o.get_location() == self.get_location().return_increased(Location(1, 0)) \
-                    and o.get_location() == self.get_location().return_increased(Location(0, -1)) \
-                    and o.get_location() == self.get_location().return_increased(Location(0, 1)):
+            if isinstance(o, Animal) and not o.is_immune_to_killing_by(self) and\
+                    (o.get_location() == self.get_location().return_increased(Location(-1, 0)) \
+                    or o.get_location() == self.get_location().return_increased(Location(1, 0)) \
+                    or o.get_location() == self.get_location().return_increased(Location(0, -1)) \
+                    or o.get_location() == self.get_location().return_increased(Location(0, 1))):
                 to_kill.append(o)
                 someone_killed = True
         if self._spreading_probability >= randint(0, 99):
