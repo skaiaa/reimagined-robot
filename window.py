@@ -42,20 +42,29 @@ class Application(tk.Frame):
         self.new_game_btn = None
         self.next_turn_btn = None
         self.logging_stext = None
+        self.board = None
         self.world = World(dimentions[0], dimentions[1])
         self.create_widgets(master)
         self.create_board(master, dimentions)
         master.bind("<Escape>", lambda _: root.destroy())
+        master.bind("<Up>", self.world.get_human().key_typed)
+        master.bind("<Down>", self.world.get_human().key_typed)
+        master.bind("<Right>", self.world.get_human().key_typed)
+        master.bind("<Left>", self.world.get_human().key_typed)
+
+    def new_turn(self):
+        self.world.play_round()
+        self.update_board()
 
     def create_widgets(self, window):
         widget_frame = tk.Frame(window)
-        self.save_btn = tk.Button(widget_frame, text="SAVE", command=self.say_hi)
+        self.save_btn = tk.Button(widget_frame, text="SAVE", command=self.world.save_to_file)
         self.save_btn.pack(side="top", fill="x")
-        self.load_btn = tk.Button(widget_frame, text="LOAD", command=self.say_hi)
+        self.load_btn = tk.Button(widget_frame, text="LOAD", command=self.world.load_from_file)
         self.load_btn.pack(side="top", fill="x")
-        self.new_game_btn = tk.Button(widget_frame, text="NEW GAME", command=self.say_hi)
+        self.new_game_btn = tk.Button(widget_frame, text="NEW GAME", command=self.world.create_new_world)
         self.new_game_btn.pack(side="top", fill="x")
-        self.next_turn_btn = tk.Button(widget_frame, text="NEXT TURN", command=self.say_hi)
+        self.next_turn_btn = tk.Button(widget_frame, text="NEXT TURN", command=self.new_turn)
         self.next_turn_btn.pack(side="top", fill="x")
         self.quit_btn = tk.Button(widget_frame, text="QUIT", fg="red", command=root.destroy)
         self.quit_btn.pack(side="top", fill="x")
@@ -94,16 +103,17 @@ class Application(tk.Frame):
             f.grid(row=i, column=j)
             return s
 
-        BOARD = [[create_square(i, j) for j in range(dimentions[0])]
-                 for i in range(dimentions[1])]
-        for o in self.world.organisms:
-            BOARD[o.get_location().y][o.get_location().x]["text"] = o.get_symbol()
+        self.board = [[create_square(i, j) for j in range(dimentions[0])]
+                      for i in range(dimentions[1])]
+        self.update_board()
         game_frame.pack(padx=10, pady=10, side="right")
-        return BOARD
 
-    def say_hi(self):
-        print("hi there, everyone!")
-
+    def update_board(self):
+        for row in self.board:
+            for button in row:
+                button["text"] = ""
+        for o in self.world.organisms:
+            self.board[o.get_location().y][o.get_location().x]["text"] = o.get_symbol()
 
 if __name__ == "__main__":
 

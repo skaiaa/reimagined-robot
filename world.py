@@ -30,18 +30,18 @@ class World:
 
     def handle_worlds_edges(self, location):
         if location.x < 0:
-            location.x = self._height - 1
-        if location.x == self._height:
-            location.x = 0
+            location.x = self._height + location.x
+        if location.x >= self._height:
+            location.x = location.x - self._height
         if location.y < 0:
-            location.y = self._width - 1
-        if location.y == self._width:
-            location.y = 0
+            location.y = self._width + location.y
+        if location.y >= self._width:
+            location.y = location.y - self._width
 
     def play_round(self):
-        tmp_organisms = copy.deepcopy(self.organisms)
+        tmp_organisms = copy.copy(self.organisms)
         # //jak w trakcie tury dodam cos do organizmow to nie moge iterowac po czyms do czego dodaje
-        while not tmp_organisms:
+        while tmp_organisms:
             # if ((tmpOrganisms.elementAt(0)).getSymbol() == 'H') logger.log("Your turn!");
             if self.execute_actions_and_check_end_of_game(tmp_organisms[0],
                                                           tmp_organisms[0].action(self.organisms),
@@ -51,8 +51,8 @@ class World:
 
     def execute_actions_and_check_end_of_game(self, organism, action, tmp_organisms):
         killed_oneself = False
-        if action.isMoving():
-            location = action.getMove()
+        if action.is_moving():
+            location = action.get_move()
             organism_already_there = self.who_is_there(location)
             if not organism_already_there:
                 # //logger.log(organism.getName() + " moving to " + location.y + " " + location.x);
@@ -83,7 +83,8 @@ class World:
             pass
             logger.log(organism.get_name() + " just activated " + action.get_ability())
 
-        tmp_organisms.pop(0)
+        if tmp_organisms:
+            tmp_organisms.pop(0)
         if not killed_oneself:
             organism.grow_older()
         return False
@@ -130,7 +131,7 @@ class World:
                 organism.set_location(collision.get_fight())
 
         if collision.is_trying_to_catch_it():
-            logger.log(organism.getName() + " is trying to catch " + organism_already_there.get_name())
+            logger.log(organism.get_name() + " is trying to catch " + organism_already_there.get_name())
             l = collision.get_catch()
             # //logger.log(organismAlreadyThere.getName() + " is trying to run away to " + l.y + " " + l.x);
             organism_on_place = self.who_is_there(l)
@@ -153,20 +154,22 @@ class World:
             name_of_victim = victim.get_name()
             name_of_killer = killer.get_name()
             if not victim.is_immune_to_killing_by(killer):
-                if victim.getlocation() == killer.get_location():
+                if victim.get_location() == killer.get_location():
                     killed_oneself = True
-                    if not organism_already_there:
+                    if organism_already_there:
                         name_of_killer = organism_already_there.get_name()
                 if victim.is_increasing_strength():
                     killer.set_strength(killer.get_strength() + victim.get_increase())
                     logger.log(
-                        name_of_victim + " increased strength of " + name_of_killer + " by " + victim.get_increase())
+                        name_of_victim + " increased strength of " + name_of_killer + " by " + str(victim.get_increase()))
                 position_in_round = self.get_position_in_vector(victim, tmp_organisms)
                 position_in_world = self.get_position_in_vector(victim, self.organisms)
                 if position_in_round > -1:
-                    tmp_organisms.remove(position_in_round)
-                self.organisms.remove(position_in_world)
-            logger.log(name_of_victim + " was eaten by " + name_of_killer)
+                    del tmp_organisms[position_in_round]
+                    #tmp_organisms.remove(position_in_round)
+                del self.organisms[position_in_world]
+                #self.organisms.remove(position_in_world)
+            logger.log(name_of_victim + " was killed by " + name_of_killer)
         return killed_oneself
 
     def get_position_in_vector(self, victim, organisms):

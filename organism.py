@@ -69,4 +69,4 @@ class Organism(ABC):
 
     @staticmethod
     def organism_sorting_key(organism):
-        return organism.get_initiative(), -organism.get_age()
+        return -organism.get_initiative(), -organism.get_age()

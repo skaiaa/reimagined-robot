@@ -32,7 +32,7 @@ class Human(Animal):
         self._using_special_ability = int(line[6])
 
     def get_strength(self):
-        return self.get_strength() + self._magic_potion
+        return super(Human, self).get_strength() + self._magic_potion
 
     def action(self, organisms):
         if self._my_move != Location(0, 0):
@@ -59,10 +59,10 @@ class Human(Animal):
                 self._magic_potion = 5
                 self._using_special_ability = 1
         if key == "Up":
-            self._my_move = Location(-1, 0)
-        if key == "Down":
-            self._my_move = Location(1, 0)
-        if key == "Left":
             self._my_move = Location(0, -1)
-        if key == "Right":
+        if key == "Down":
             self._my_move = Location(0, 1)
+        if key == "Left":
+            self._my_move = Location(-1, 0)
+        if key == "Right":
+            self._my_move = Location(1, 0)

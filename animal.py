@@ -34,7 +34,8 @@ class Animal(Organism):
     def choose_new_location(self, from_where):
         # Random random=new Random();
         change_in_location = self._location_handler.random_near_location(self.get_location(), from_where, self._step)
-        return Location(from_where.return_increased(change_in_location))
+        result=from_where.return_increased(change_in_location)
+        return Location(result.x,result.y)
 
     def action(self, organisms):
         return Moving(self.choose_new_location(self.get_location()), [])

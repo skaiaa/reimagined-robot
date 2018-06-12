@@ -19,7 +19,7 @@ class OrganismGenerator:
 
     @staticmethod
     def get_initial_organisms(width, height):
-        all_symbols = "WAFTSbguds"
+        all_symbols = "WAFSSSSSSSSSSSSSSSSudssssssssssssssss"
         initial_organisms = []
         for l in all_symbols:
             # tutaj robie po jednym kazdego rodzaju
@@ -44,6 +44,7 @@ class OrganismGenerator:
             'A': lambda: Antelope(LocationHandler()),
             'H': lambda: Human(LocationHandler()),
             'T': lambda: Turtle(LocationHandler()),
+            'C': lambda: CyberSheep(LocationHandler()),
             'g': Grass,
             'd': Dandelion,
             'b': Belladonna,
