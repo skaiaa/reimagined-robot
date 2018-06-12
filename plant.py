@@ -17,15 +17,14 @@ class Plant(Organism):
     def set_strength(self, s):
         pass
 
-    def get_info_for_save(self):
+    def info_for_save(self):
         return str(self._age) + " " + str(self._spreading_probability) + " " + str(self.get_location().x) + " " + str(
             self.get_location().y) + "\n"
 
     def get_color(self):
         return "green"
 
-    def set_stats_from_file(self, line):
-        line = line.split()
+    def retrieve_stats_from_file(self, line):
         self._age = int(line[0])
         self._spreading_probability = int(line[1])
         self._location.x = int(line[2])

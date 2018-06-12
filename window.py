@@ -1,7 +1,11 @@
 import tkinter as tk
 from virtual_world.gui import Dialog
 from tkinter import scrolledtext
+
+from virtual_world.organism_generator import OrganismGenerator
+from virtual_world.location import Location
 from virtual_world.world import World
+from virtual_world.logger import logger
 
 
 class WorldSizeDialog(Dialog):
@@ -31,6 +35,47 @@ class WorldSizeDialog(Dialog):
 
         self.result = (x, y)
 
+class AddOrganismDialog(Dialog):
+    def __init__(self, parent, title):
+        self.file_name = None
+        self.result = None
+        super(AddOrganismDialog, self).__init__(parent, title)
+
+    def body(self, master):
+        self.tkvar = tk.StringVar(root)
+        choices = {'S', 'A', 'W', 'T', 'C'}
+        self.tkvar.set('S')  # set the default option
+
+        popupMenu = tk.OptionMenu(master, self.tkvar, *choices)
+        tk.Label(master, text="Choose an organism").grid(row=1, column=1)
+        popupMenu.grid(row=2, column=1)
+
+        return popupMenu  # initial focus
+
+    def apply(self):
+        self.result = str(self.tkvar.get())
+
+    def validate(self):
+        return True
+
+class FileNameDialog(Dialog):
+    def __init__(self, parent, title):
+        self.file_name = None
+        self.result = None
+        super(FileNameDialog, self).__init__(parent, title)
+
+    def body(self, master):
+        tk.Label(master, text="File name:").grid(row=0)
+
+        self.file_name = tk.Entry(master)
+        self.file_name.grid(row=0, column=1)
+        return self.file_name  # initial focus
+
+    def apply(self):
+        self.result = str(self.file_name.get())
+
+    def validate(self):
+        return True
 
 class Application(tk.Frame):
     def __init__(self, master, dimentions):
@@ -43,8 +88,18 @@ class Application(tk.Frame):
         self.next_turn_btn = None
         self.logging_stext = None
         self.board = None
+        self.game_frame = None
         self.world = World(dimentions[0], dimentions[1])
         self.create_widgets(master)
+
+        def append_log(log):
+            self.logging_stext.configure(state="normal")
+            self.logging_stext.insert(tk.END, log+"\n")
+            self.logging_stext.configure(state="disabled")
+            # Autoscroll to the bottom
+            self.logging_stext.yview(tk.END)
+
+        logger.set_appender(append_log)
         self.create_board(master, dimentions)
         master.bind("<Escape>", lambda _: root.destroy())
         master.bind("<Up>", self.world.get_human().key_typed)
@@ -52,17 +107,33 @@ class Application(tk.Frame):
         master.bind("<Right>", self.world.get_human().key_typed)
         master.bind("<Left>", self.world.get_human().key_typed)
 
+
     def new_turn(self):
         self.world.play_round()
         self.update_board()
 
+    def save(self):
+        dial = FileNameDialog(self.master, "Enter file name")
+        self.world.save_to_file(dial.result)
+
+    def load(self):
+        dial = FileNameDialog(self.master, "Enter file name")
+        self.world.load_from_file(dial.result)
+        self.game_frame.destroy()
+        self.create_board(self.master, (self.world.get_width(), self.world.get_height()))
+        self.update_board()
+
+    def new_game(self):
+        self.world.create_new_world()
+        self.update_board()
+
     def create_widgets(self, window):
         widget_frame = tk.Frame(window)
-        self.save_btn = tk.Button(widget_frame, text="SAVE", command=self.world.save_to_file)
+        self.save_btn = tk.Button(widget_frame, text="SAVE", command=self.save)
         self.save_btn.pack(side="top", fill="x")
-        self.load_btn = tk.Button(widget_frame, text="LOAD", command=self.world.load_from_file)
+        self.load_btn = tk.Button(widget_frame, text="LOAD", command=self.load)
         self.load_btn.pack(side="top", fill="x")
-        self.new_game_btn = tk.Button(widget_frame, text="NEW GAME", command=self.world.create_new_world)
+        self.new_game_btn = tk.Button(widget_frame, text="NEW GAME", command=self.new_game)
         self.new_game_btn.pack(side="top", fill="x")
         self.next_turn_btn = tk.Button(widget_frame, text="NEXT TURN", command=self.new_turn)
         self.next_turn_btn.pack(side="top", fill="x")
@@ -79,16 +150,22 @@ class Application(tk.Frame):
         widget_frame.pack(side="left")
 
     def create_board(self, window, dimentions):
-        game_frame = tk.Frame(window, borderwidth=2, relief=tk.SUNKEN)
+        self.game_frame = tk.Frame(window, borderwidth=2, relief=tk.SUNKEN)
 
         def create_square(i, j):
-            f = tk.Frame(game_frame, height=30, width=30)
+            f = tk.Frame(self.game_frame, height=30, width=30)
             s = tk.Button(f, borderwidth=1, state="normal", foreground="#000000")
             s.pack(fill=tk.BOTH, expand=True)
 
             # buttons bindings
-            def __handler(event, x=i, y=j):
-                pass
+            def __handler(event, x=j, y=i):
+                if not self.world.who_is_there(Location(x, y)):
+                    dialog = AddOrganismDialog(self.master, "Choose an organism")
+                    o = OrganismGenerator.get_organism(dialog.result)
+                    o.set_location(Location(x, y))
+                    self.world.organisms.append(o)
+
+                    self.update_board()
                 # if event.num == 1:
                 #     handlers.left_handler(GRID, BOARD, i, j, mine)
                 # elif event.num == 3:
@@ -106,12 +183,13 @@ class Application(tk.Frame):
         self.board = [[create_square(i, j) for j in range(dimentions[0])]
                       for i in range(dimentions[1])]
         self.update_board()
-        game_frame.pack(padx=10, pady=10, side="right")
+        self.game_frame.pack(padx=10, pady=10, side="right")
 
     def update_board(self):
         for row in self.board:
             for button in row:
                 button["text"] = ""
+                button["state"] = "disabled"
         for o in self.world.organisms:
             self.board[o.get_location().y][o.get_location().x]["text"] = o.get_symbol()
 

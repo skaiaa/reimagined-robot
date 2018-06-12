@@ -34,10 +34,10 @@ class Organism(ABC):
     def set_strength(self, strength):
         pass
 
-    def get_info_for_save(self):
+    def info_for_save(self):
         pass
 
-    def set_stats_from_file(self, line):
+    def retrieve_stats_from_file(self, line):
         pass
 
     def get_color(self):

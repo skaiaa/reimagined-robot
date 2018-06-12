@@ -26,8 +26,8 @@ class Human(Animal):
                + " " + str(self._location.x) + " " + str(self._location.y) \
                + " " + str(self._magic_potion) + " " + str(self._using_special_ability) + "\n"
 
-    def get_stats_from_file(self, line):
-        super().get_stats_from_file(line)
+    def retrieve_stats_from_file(self, line):
+        super().retrieve_stats_from_file(line)
         self._magic_potion = int(line[5])
         self._using_special_ability = int(line[6])
 

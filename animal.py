@@ -23,8 +23,7 @@ class Animal(Organism):
         return str(self._age) + " " + str(self._step) + " " + str(self._strength) \
                + " " + str(self._location.x) + " " + str(self._location.y) + "\n"
 
-    def get_stats_from_file(self, line):
-        line = line.split()
+    def retrieve_stats_from_file(self, line):
         self._age = int(line[0])
         self._step = int(line[1])
         self._strength = int(line[2])

@@ -93,8 +93,8 @@ class World:
         with open(file_name, "w") as text_file:
             text_file.write(str(self._width) + " " + str(self._height) + "\n")
             for o in self.organisms:
-                info = o.getInfoForSave()
-                text_file.write(str(o.getSymbol()) + " " + info + "\n")
+                info = o.info_for_save()
+                text_file.write(str(o.get_symbol()) + " " + info)
 
     def load_from_file(self, file_name):
         self.kill_all_organisms()
@@ -106,10 +106,10 @@ class World:
                 for line in text_file:
                     stats = line.split()
                     o = OrganismGenerator.get_organism(stats[0])
-                    o.get_stats_from_file(stats[1:])
+                    o.retrieve_stats_from_file(stats[1:])
                     self.organisms.append(o)
         except Exception:
-            print("Cannot read organisms!")
+            logger.log("Cannot read organisms!")
 
     def execute_collisions_and_check_if_killed_oneself(self, organism, collision, organism_already_there,
                                                        tmp_organisms):
