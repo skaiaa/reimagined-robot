@@ -7,7 +7,7 @@ from virtual_world.plants import SosnowskysBorscht
 
 class Sheep(Animal):
     def __init__(self, lh):
-        super(Sheep, self).__init__(4,lh)
+        super(Sheep, self).__init__(4, lh)
 
     def get_name(self):
         return "Sheep"
@@ -23,8 +23,8 @@ class Sheep(Animal):
 
 
 class Antelope(Animal):
-    def __init__(self,lh):
-        super(Antelope, self).__init__(4,lh)
+    def __init__(self, lh):
+        super(Antelope, self).__init__(4, lh)
         self.set_step(2)
 
     def is_running_away(self):
@@ -44,8 +44,8 @@ class Antelope(Animal):
 
 
 class Fox(Animal):
-    def __init__(self,lh):
-        super(Fox, self).__init__(3,lh)
+    def __init__(self, lh):
+        super(Fox, self).__init__(3, lh)
 
     def get_name(self):
         return "Fox"
@@ -59,7 +59,7 @@ class Fox(Animal):
     def action(self, organisms):
         new_location = self.choose_new_location(self.get_location())
         for o in organisms:
-            if (o.get_location() == new_location) and (o.get_strength > self.get_strength()):
+            if (o.get_location() == new_location) and (o.get_strength() > self.get_strength()):
                 return DoNothing()
             else:
                 return Moving(new_location, [])
@@ -69,8 +69,8 @@ class Fox(Animal):
 
 
 class Turtle(Animal):
-    def __init__(self,lh):
-        super(Turtle, self).__init__(2,lh)
+    def __init__(self, lh):
+        super(Turtle, self).__init__(2, lh)
         self._probability_to_move = 25
 
     def get_name(self):
@@ -97,8 +97,8 @@ class Turtle(Animal):
 
 
 class Wolf(Animal):
-    def __init__(self,lh):
-        super(Wolf, self).__init__(9,lh)
+    def __init__(self, lh):
+        super(Wolf, self).__init__(9, lh)
 
     def get_name(self):
         return "Wolf"

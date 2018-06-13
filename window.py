@@ -35,6 +35,7 @@ class WorldSizeDialog(Dialog):
 
         self.result = (x, y)
 
+
 class AddOrganismDialog(Dialog):
     def __init__(self, parent, title):
         self.file_name = None
@@ -43,8 +44,8 @@ class AddOrganismDialog(Dialog):
 
     def body(self, master):
         self.tkvar = tk.StringVar(root)
-        choices = {'Sheep', 'Antelope', 'Wolf', 'Turtle', 'CyberSheep'
-                   'belladonna', 'grass', 'guarana', 'sosnowskyBorshcht', 'dandelion'}
+        choices = ('Sheep', 'Antelope', 'Wolf', 'Turtle', 'CyberSheep', 'Human',
+                   'belladonna', 'grass', 'guarana', 'sosnowskyBorshcht', 'dandelion')
         self.tkvar.set('Sheep')  # set the default option
 
         popupMenu = tk.OptionMenu(master, self.tkvar, *choices)
@@ -56,11 +57,13 @@ class AddOrganismDialog(Dialog):
     def apply(self):
         if str(self.tkvar.get()) == "guarana":
             self.result = str(self.tkvar.get())[1]
+
         else:
             self.result = str(self.tkvar.get())[0]
 
     def validate(self):
         return True
+
 
 class FileNameDialog(Dialog):
     def __init__(self, parent, title):
@@ -81,6 +84,7 @@ class FileNameDialog(Dialog):
     def validate(self):
         return True
 
+
 class Application(tk.Frame):
     def __init__(self, master, dimentions):
         super().__init__(master)
@@ -98,7 +102,7 @@ class Application(tk.Frame):
 
         def append_log(log):
             self.logging_stext.configure(state="normal")
-            self.logging_stext.insert(tk.END, log+"\n")
+            self.logging_stext.insert(tk.END, log + "\n")
             self.logging_stext.configure(state="disabled")
             # Autoscroll to the bottom
             self.logging_stext.yview(tk.END)
@@ -111,10 +115,28 @@ class Application(tk.Frame):
         master.bind("<Right>", self.human_move)
         master.bind("<Left>", self.human_move)
         master.bind("p", self.human_move)
+        master.bind("n", self.manage_key)
+        master.bind("s", self.manage_key)
+        master.bind("l", self.manage_key)
+        master.bind("<space>", self.manage_key)
+
+    def manage_key(self, e):
+        key = e.keysym
+        if key == "n":
+            self.new_game()
+        if key == "s":
+            self.save()
+        if key == "l":
+            self.load()
+        if key == "space":
+            self.new_turn()
 
     def human_move(self, key):
-        self.world.get_human().key_typed(key)
-        self.new_turn()
+        if self.world.get_human():
+            self.world.get_human().key_typed(key)
+            self.new_turn()
+        else:
+            logger.log("Human is dead")
 
     def new_turn(self):
         self.world.play_round()
@@ -137,15 +159,15 @@ class Application(tk.Frame):
 
     def create_widgets(self, window):
         widget_frame = tk.Frame(window)
-        self.save_btn = tk.Button(widget_frame, text="SAVE", command=self.save)
+        self.save_btn = tk.Button(widget_frame, text="SAVE [s]", command=self.save)
         self.save_btn.pack(side="top", fill="x")
-        self.load_btn = tk.Button(widget_frame, text="LOAD", command=self.load)
+        self.load_btn = tk.Button(widget_frame, text="LOAD [l]", command=self.load)
         self.load_btn.pack(side="top", fill="x")
-        self.new_game_btn = tk.Button(widget_frame, text="NEW GAME", command=self.new_game)
+        self.new_game_btn = tk.Button(widget_frame, text="NEW GAME [n]", command=self.new_game)
         self.new_game_btn.pack(side="top", fill="x")
-        self.next_turn_btn = tk.Button(widget_frame, text="NEXT TURN", command=self.new_turn)
+        self.next_turn_btn = tk.Button(widget_frame, text="NEXT TURN [space]", command=self.new_turn)
         self.next_turn_btn.pack(side="top", fill="x")
-        self.quit_btn = tk.Button(widget_frame, text="QUIT", fg="red", command=root.destroy)
+        self.quit_btn = tk.Button(widget_frame, text="QUIT [esc]", fg="red", command=root.destroy)
         self.quit_btn.pack(side="top", fill="x")
         self.logging_stext = scrolledtext.ScrolledText(widget_frame, state="disabled")
         self.logging_stext.configure(font="TkDefaultFont")
@@ -169,17 +191,15 @@ class Application(tk.Frame):
             def __handler(event, x=j, y=i):
                 if not self.world.who_is_there(Location(x, y)):
                     dialog = AddOrganismDialog(self.master, "Choose an organism")
-                    o = OrganismGenerator.get_organism(dialog.result)
-                    o.set_location(Location(x, y))
-                    self.world.organisms.append(o)
-
-                    self.update_board()
-                # if event.num == 1:
-                #     handlers.left_handler(GRID, BOARD, i, j, mine)
-                # elif event.num == 3:
-                #     handlers.right_handler(GRID, BOARD, i, j, flag)
-                # else:
-                #     raise Exception('Invalid event code.')
+                    if not (dialog.result == "H" and self.world.get_human()):
+                        o = OrganismGenerator.get_organism(dialog.result)
+                        o.set_location(Location(x, y))
+                        self.world.organisms.append(o)
+                        self.update_board()
+                    else:
+                        logger.log("There can only be one human!")
+                else:
+                    logger.log("Field taken by " + self.world.who_is_there(Location(x, y)).get_name())
 
             s.bind("<Button-1>", __handler)
             s.bind("<Button-3>", __handler)
@@ -201,9 +221,10 @@ class Application(tk.Frame):
         for o in self.world.organisms:
             self.board[o.get_location().y][o.get_location().x]["text"] = o.get_symbol()
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     root = tk.Tk()
+    root.wm_title("Anna Przybycien 172126")
     dialog = WorldSizeDialog(root, "Enter world size")
     app = Application(root, dialog.result)
     app.mainloop()
