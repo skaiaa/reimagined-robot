@@ -43,8 +43,9 @@ class AddOrganismDialog(Dialog):
 
     def body(self, master):
         self.tkvar = tk.StringVar(root)
-        choices = {'S', 'A', 'W', 'T', 'C'}
-        self.tkvar.set('S')  # set the default option
+        choices = {'Sheep', 'Antelope', 'Wolf', 'Turtle', 'CyberSheep'
+                   'belladonna', 'grass', 'guarana', 'sosnowskyBorshcht', 'dandelion'}
+        self.tkvar.set('Sheep')  # set the default option
 
         popupMenu = tk.OptionMenu(master, self.tkvar, *choices)
         tk.Label(master, text="Choose an organism").grid(row=1, column=1)
@@ -53,7 +54,10 @@ class AddOrganismDialog(Dialog):
         return popupMenu  # initial focus
 
     def apply(self):
-        self.result = str(self.tkvar.get())
+        if str(self.tkvar.get()) == "guarana":
+            self.result = str(self.tkvar.get())[1]
+        else:
+            self.result = str(self.tkvar.get())[0]
 
     def validate(self):
         return True
@@ -102,11 +106,15 @@ class Application(tk.Frame):
         logger.set_appender(append_log)
         self.create_board(master, dimentions)
         master.bind("<Escape>", lambda _: root.destroy())
-        master.bind("<Up>", self.world.get_human().key_typed)
-        master.bind("<Down>", self.world.get_human().key_typed)
-        master.bind("<Right>", self.world.get_human().key_typed)
-        master.bind("<Left>", self.world.get_human().key_typed)
+        master.bind("<Up>", self.human_move)
+        master.bind("<Down>", self.human_move)
+        master.bind("<Right>", self.human_move)
+        master.bind("<Left>", self.human_move)
+        master.bind("p", self.human_move)
 
+    def human_move(self, key):
+        self.world.get_human().key_typed(key)
+        self.new_turn()
 
     def new_turn(self):
         self.world.play_round()

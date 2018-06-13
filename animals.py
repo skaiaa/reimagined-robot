@@ -114,7 +114,7 @@ class Wolf(Animal):
 
 
 class CyberSheep(Sheep):
-    def __init__(self,lh):
+    def __init__(self, lh):
         super(CyberSheep, self).__init__(lh)
 
     def get_name(self):

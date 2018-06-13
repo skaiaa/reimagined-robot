@@ -54,7 +54,7 @@ class Human(Animal):
     def key_typed(self, e):
         key = e.keysym
 
-        if key == 'P':
+        if key == "p":
             if self._using_special_ability == 0:
                 self._magic_potion = 5
                 self._using_special_ability = 1
